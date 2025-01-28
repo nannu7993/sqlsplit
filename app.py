@@ -32,23 +32,17 @@ def split_sql_file(file_path, output_dir, chunk_size_mb=50):
 
 # Streamlit GUI setup
 st.title("SQL File Splitter")
-st.write("Upload a large SQL file to split it into smaller files of 50 MB each.")
+st.write("This app splits large SQL files into smaller files of 50 MB each.")
 
-# File upload
-uploaded_file = st.file_uploader("Upload your SQL file", type=["sql"])
-
-if uploaded_file:
-    # Save uploaded file temporarily
-    temp_file_path = Path(f"temp_{uploaded_file.name}")
-    with open(temp_file_path, 'wb') as temp_file:
-        temp_file.write(uploaded_file.read())
-
-    st.success("File uploaded successfully!")
-
+# File path input
+uploaded_path = st.text_input("Enter the path to the SQL file on the server:")
+if uploaded_path and Path(uploaded_path).is_file():
+    st.success(f"File found: {uploaded_path}")
+    
     # Process button
     if st.button("Process"):
         output_dir = Path("split_files")
-        split_sql_file(temp_file_path, output_dir, chunk_size_mb=50)
+        split_sql_file(uploaded_path, output_dir, chunk_size_mb=50)
 
         st.success(f"File split successfully into {len(list(output_dir.iterdir()))} parts.")
 
@@ -61,6 +55,5 @@ if uploaded_file:
                     data=f,
                     file_name=split_file.name
                 )
-
-    # Clean up temporary file
-    temp_file_path.unlink()
+else:
+    st.warning("Please enter a valid file path.")
